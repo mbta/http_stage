@@ -6,20 +6,15 @@ defmodule HttpStage.StateMachine do
   * `fetch_after`: number of milliseconds between fetches
   * `content_warning_timeout`: number of milliseconds after which to log an error that the file is out of date
   * `fallback_url`: (optional) URL to use once the `content_warning_timeout` is hit.
-  * `get_opts`: (optional) values to pass as options to HTTPoison
+  * `get_opts`: (optional) values to pass as options to Req
   """
   require Logger
   alias HttpStage.FileTap
-  @default_timeout 15_000
   @default_fetch_after 5_000
   @default_content_warning_timeout 600_000
 
   defstruct url: "",
-            get_opts: [
-              timeout: @default_timeout,
-              recv_timeout: @default_timeout,
-              hackney: [pool: :http_producer_pool]
-            ],
+            get_opts: [],
             headers: %{"accept-encoding" => "gzip"},
             fetch_after: @default_fetch_after,
             content_warning_timeout: @default_content_warning_timeout,
@@ -114,12 +109,12 @@ defmodule HttpStage.StateMachine do
 
   defp handle_message(machine, {:fetch, url}) do
     message =
-      case HTTPoison.get(url, machine.headers, machine.get_opts) do
-        {:ok, %HTTPoison.Response{} = response} ->
+      case Req.get(url, Keyword.merge([headers: machine.headers], machine.get_opts)) do
+        {:ok, %Req.Response{} = response} ->
           {:http_response, response}
 
-        {:error, %HTTPoison.Error{reason: reason}} ->
-          {:http_error, reason}
+        {:error, exception} ->
+          {:http_error, exception}
       end
 
     {machine, [], [{message, 0}]}
@@ -127,7 +122,7 @@ defmodule HttpStage.StateMachine do
 
   defp handle_message(
          machine,
-         {:http_response, %{status_code: 200, headers: headers, body: body}}
+         {:http_response, %{status: 200, headers: headers, body: body}}
        ) do
     body = decode_body(headers, body)
     {bodies, machine} = parse_bodies_if_changed(machine, body)
@@ -139,7 +134,7 @@ defmodule HttpStage.StateMachine do
     {machine, bodies, messages}
   end
 
-  defp handle_message(machine, {:http_response, %{status_code: 301, headers: headers}}) do
+  defp handle_message(machine, {:http_response, %{status: 301, headers: headers}}) do
     # permanent redirect: save the new URL
     {:ok, new_url} = find_header(headers, "location")
     machine = %{machine | url: new_url}
@@ -149,7 +144,7 @@ defmodule HttpStage.StateMachine do
     {machine, [], messages}
   end
 
-  defp handle_message(machine, {:http_response, %{status_code: 302, headers: headers}}) do
+  defp handle_message(machine, {:http_response, %{status: 302, headers: headers}}) do
     # temporary redirect: request the new URL but don't save it
     {:ok, new_url} = find_header(headers, "location")
     {machine, messages} = check_last_success(machine)
@@ -158,7 +153,7 @@ defmodule HttpStage.StateMachine do
     {machine, [], messages}
   end
 
-  defp handle_message(machine, {:http_response, %{status_code: 304}}) do
+  defp handle_message(machine, {:http_response, %{status: 304}}) do
     # not modified
     _ =
       Logger.info(fn ->
@@ -171,16 +166,26 @@ defmodule HttpStage.StateMachine do
     {machine, [], messages}
   end
 
-  defp handle_message(machine, {:http_response, %{status_code: code}}) do
+  defp handle_message(machine, {:http_response, %{status: code}}) do
     handle_message(machine, {:http_error, {:unexpected_code, code}})
   end
 
-  defp handle_message(machine, {:http_error, reason}) do
-    log_level = error_log_level(reason)
-
+  defp handle_message(machine, {:http_error, {:unexpected_code, code}}) do
     _ =
-      Logger.log(log_level, fn ->
-        "#{__MODULE__}: url=#{inspect(machine.url)} error=#{inspect(reason)}"
+      Logger.log(:warn, fn ->
+        "#{__MODULE__}: url=#{inspect(machine.url)} Unexpected response status code=#{code}"
+      end)
+
+    {machine, messages} = check_last_success(machine)
+    message = {:fetch, machine.url}
+    messages = include_fallback_messages(message, machine.fetch_after, messages)
+    {machine, [], messages}
+  end
+
+  defp handle_message(machine, {:http_error, exception}) do
+    _ =
+      Logger.log(:error, fn ->
+        "#{__MODULE__}: url=#{inspect(machine.url)} error=#{inspect(Exception.message(exception))}"
       end)
 
     {machine, messages} = check_last_success(machine)
@@ -203,10 +208,8 @@ defmodule HttpStage.StateMachine do
 
   defp handle_message(machine, {:ssl_closed, _} = reason) do
     # log, but otherwise ignore
-    log_level = error_log_level(reason)
-
     _ =
-      Logger.log(log_level, fn ->
+      Logger.log(:error, fn ->
         "#{__MODULE__}: url=#{inspect(machine.url)} error=#{inspect(reason)}"
       end)
 
@@ -379,13 +382,6 @@ defmodule HttpStage.StateMachine do
   defp include_fallback_messages(message, delay, fallback_messages) do
     [{message, delay} | fallback_messages]
   end
-
-  defp error_log_level(:closed), do: :warn
-  defp error_log_level({:closed, _}), do: :warn
-  defp error_log_level({:ssl_closed, _}), do: :info
-  defp error_log_level(:timeout), do: :warn
-  defp error_log_level({:unexpected_code, _}), do: :warn
-  defp error_log_level(_), do: :error
 
   defp now do
     System.monotonic_time(:millisecond)

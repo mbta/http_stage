@@ -4,7 +4,7 @@ defmodule HttpStage.MixProject do
   def project do
     [
       app: :http_stage,
-      version: "0.1.0",
+      version: "1.0.0",
       elixir: "~> 1.14",
       start_permanent: Mix.env() == :prod,
       deps: deps()
@@ -23,8 +23,8 @@ defmodule HttpStage.MixProject do
     [
       {:bypass, "~> 2.1", only: :test},
       {:gen_stage, "~> 1.2"},
-      {:httpoison, "~> 2.1"},
       {:plug, "~> 1.14"},
+      {:req, "~> 0.3.0"},
       {:stream_data, "~> 0.5.0", only: :test}
     ]
   end
