@@ -10,7 +10,7 @@ by adding `http_stage` to your list of dependencies in `mix.exs`:
 ```elixir
 def deps do
   [
-    {:http_stage, "~> 0.1.0"}
+    {:http_stage, "~> 0.2.0"}
   ]
 end
 ```
