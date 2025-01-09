@@ -1,13 +1,20 @@
 defmodule HttpStage.MixProject do
   use Mix.Project
 
+  @name "HttpStage"
+  @version "0.1.0"
+  @source_url "https://github.com/mbta/http_stage"
+
   def project do
     [
+      name: @name,
+      source_url: @source_url,
+      version: @version,
       app: :http_stage,
-      version: "0.1.0",
-      elixir: "~> 1.14",
+      elixir: "~> 1.12",
       start_permanent: Mix.env() == :prod,
-      deps: deps()
+      deps: deps(),
+      package: package()
     ]
   end
 
@@ -21,8 +28,22 @@ defmodule HttpStage.MixProject do
   # Run "mix help deps" to learn about dependencies.
   defp deps do
     [
-      # {:dep_from_hexpm, "~> 0.3.0"},
-      # {:dep_from_git, git: "https://github.com/elixir-lang/my_dep.git", tag: "0.1.0"}
+      {:bypass, "~> 2.1", only: :test},
+      {:gen_stage, "~> 1.2"},
+      {:httpoison, "~> 2.1"},
+      {:plug, "~> 1.14"},
+      {:stream_data, "~> 0.5.0", only: :test}
+    ]
+  end
+
+  defp package do
+    [
+      name: @name,
+      description: "HttpStage is a GenStage producer for data available via an HTTP GET request.",
+      licenses: ["MIT"],
+      links: %{
+        "GitHub" => @source_url
+      }
     ]
   end
 end
