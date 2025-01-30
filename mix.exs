@@ -36,6 +36,7 @@ defmodule HttpStage.MixProject do
       {:httpoison, "~> 2.1"},
       {:lcov_ex, "~> 0.3", only: [:dev, :test], runtime: false},
       {:plug, "~> 1.14"},
+      {:sobelow, "~> 0.13", only: [:dev, :test], runtime: false},
       {:stream_data, "~> 0.5.0", only: :test}
     ]
   end
