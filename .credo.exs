@@ -162,6 +162,7 @@
           {Credo.Check.Warning.WrongTestFileExtension, []}
         ],
         disabled: [
+          {Credo.Check.Warning.Dbg, []},	# requires Elixir >= 1.14.0-dev
           #
           # Checks scheduled for next check update (opt-in for now)
           {Credo.Check.Refactor.UtcNowTruncate, []},
