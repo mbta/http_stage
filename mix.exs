@@ -29,6 +29,7 @@ defmodule HttpStage.MixProject do
   defp deps do
     [
       {:bypass, "~> 2.1", only: :test},
+      {:credo, "~> 1.7", only: [:dev, :test], runtime: false},
       {:gen_stage, "~> 1.2"},
       {:httpoison, "~> 2.1"},
       {:plug, "~> 1.14"},
