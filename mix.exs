@@ -14,7 +14,8 @@ defmodule HttpStage.MixProject do
       elixir: "~> 1.12",
       start_permanent: Mix.env() == :prod,
       deps: deps(),
-      package: package()
+      package: package(),
+      test_coverage: [tool: LcovEx]
     ]
   end
 
@@ -29,9 +30,13 @@ defmodule HttpStage.MixProject do
   defp deps do
     [
       {:bypass, "~> 2.1", only: :test},
+      {:credo, "~> 1.7", only: [:dev, :test], runtime: false},
+      {:dialyxir, "~> 1.4", only: [:dev, :test], runtime: false},
       {:gen_stage, "~> 1.2"},
       {:httpoison, "~> 2.1"},
+      {:lcov_ex, "~> 0.3", only: [:dev, :test], runtime: false},
       {:plug, "~> 1.14"},
+      {:sobelow, "~> 0.13", only: [:dev, :test], runtime: false},
       {:stream_data, "~> 0.5.0", only: :test}
     ]
   end
