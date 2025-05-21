@@ -15,6 +15,7 @@ defmodule HttpStage.MixProject do
       start_permanent: Mix.env() == :prod,
       deps: deps(),
       package: package(),
+      docs: docs(),
       test_coverage: [tool: LcovEx]
     ]
   end
@@ -32,6 +33,8 @@ defmodule HttpStage.MixProject do
       {:bypass, "~> 2.1", only: :test},
       {:credo, "~> 1.7", only: [:dev, :test], runtime: false},
       {:dialyxir, "~> 1.4", only: [:dev, :test], runtime: false},
+      # Specifically targeting ex_doc v0.33 because it is the last version compatible with Elixir 1.12
+      {:ex_doc, "~> 0.33.0", only: :dev, runtime: false},
       {:gen_stage, "~> 1.2"},
       {:httpoison, "~> 2.1"},
       {:lcov_ex, "~> 0.3", only: [:dev, :test], runtime: false},
@@ -49,6 +52,17 @@ defmodule HttpStage.MixProject do
       links: %{
         "GitHub" => @source_url
       }
+    ]
+  end
+
+  defp docs do
+    [
+      main: "readme",
+      source_url: @source_url,
+      source_ref: "v#{@version}",
+      extras: [
+        "README.md"
+      ]
     ]
   end
 end
