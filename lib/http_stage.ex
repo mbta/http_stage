@@ -8,9 +8,7 @@ defmodule HttpStage do
   @start_link_opts [:name]
 
   defmodule State do
-    @moduledoc """
-    Module for keeping track of the state for an HTTP producer.
-    """
+    @moduledoc false
     defstruct [:machine, demand: 0]
   end
 
