@@ -6,7 +6,6 @@ defmodule HttpStage.StateMachineTest do
 
   setup_all do
     Application.ensure_all_started(:bypass)
-    Application.ensure_all_started(:httpoison)
     :ok
   end
 
@@ -63,65 +62,17 @@ defmodule HttpStage.StateMachineTest do
     end
   end
 
-  describe "decode_body/2" do
-    test "decodes a gzipped body if that is the encoding" do
-      headers =
-        Enum.shuffle([
-          {"ETag", "hello"},
-          {"Content-Encoding", "gzip"}
-        ])
-
-      body = "body"
-      encoded_body = :zlib.gzip(body)
-      assert decode_body(headers, encoded_body) == body
-    end
-
-    test "defaults to not decoding" do
-      headers = [{"ETag", "hello"}]
-      body = "body"
-      assert decode_body(headers, body) == body
-    end
-  end
-
   describe "message/2" do
-    test "does not log an error on :closed or :timeout errors" do
+    test "logs errors" do
       machine = init("url", parser: &List.wrap/1)
-
-      for reason <- [:closed, {:closed, :timeout}, :timeout] do
-        error = {:http_error, reason}
-
-        log =
-          capture_log([level: :error], fn ->
-            assert {_machine, [], [{{:fetch, _}, _}]} = message(machine, error)
-          end)
-
-        assert log == ""
-      end
-    end
-
-    test "does not log an error on :ssl_closed errors" do
-      machine = init("url", parser: &List.wrap/1)
-
-      error = {:ssl_closed, :closed}
-
-      log =
-        capture_log([level: :error], fn ->
-          assert {_machine, [], _} = message(machine, error)
-        end)
-
-      assert log == ""
-    end
-
-    test "does log other errors" do
-      machine = init("url", parser: &List.wrap/1)
-      error = {:http_error, :unknown_error}
+      error = {:http_error, RuntimeError.exception("Unknown error")}
 
       log =
         capture_log([level: :error], fn ->
           assert {_machine, [], [{{:fetch, _}, _}]} = message(machine, error)
         end)
 
-      assert log =~ ":unknown_error"
+      assert log =~ "Unknown error"
     end
 
     test "logs a error if we have't gotten content since a timeout" do
@@ -216,7 +167,7 @@ defmodule HttpStage.StateMachineTest do
       fetch_after = 1000
 
       log =
-        capture_log([level: :warn], fn ->
+        capture_log([level: :warning], fn ->
           assert {_machine, [], [{{:fetch, "url"}, ^fetch_after} | _]} =
                    run_machine("url", [fetch_after: fetch_after], messages)
         end)
@@ -307,6 +258,6 @@ defmodule HttpStage.StateMachineTest do
     code = Keyword.get(opts, :code, 200)
     body = Keyword.get(opts, :body, "")
     headers = Keyword.get(opts, :headers, [])
-    %HTTPoison.Response{status_code: code, body: body, headers: headers}
+    %Req.Response{body: body, headers: headers, status: code}
   end
 end
