@@ -34,7 +34,7 @@ defmodule HttpStage.MixProject do
       {:credo, "~> 1.7", only: [:dev, :test], runtime: false},
       {:dialyxir, "~> 1.4", only: [:dev, :test], runtime: false},
       # Specifically targeting ex_doc v0.33 because it is the last version compatible with Elixir 1.12
-      {:ex_doc, "~> 0.33.0", only: :dev, runtime: false},
+      {:ex_doc, "~> 0.38.1", only: :dev, runtime: false},
       {:gen_stage, "~> 1.2"},
       {:httpoison, "~> 2.1"},
       {:lcov_ex, "~> 0.3", only: [:dev, :test], runtime: false},
