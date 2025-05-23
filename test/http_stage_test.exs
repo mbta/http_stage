@@ -30,7 +30,7 @@ defmodule HttpStageTest do
     test "does not send more demand than requested" do
       machine = StateMachine.init("url", parser: &[&1])
       state = %HttpStage.State{machine: machine, demand: 1}
-      response = %HTTPoison.Response{status_code: 200, body: "body"}
+      response = %Req.Response{body: "body", status: 200}
       assert {:noreply, [_], state, :hibernate} = handle_info({:http_response, response}, state)
 
       assert {:noreply, [], state} =
@@ -54,7 +54,6 @@ defmodule HttpStageTest do
   describe "bypass" do
     setup do
       Application.ensure_all_started(:bypass)
-      Application.ensure_all_started(:httpoison)
       bypass = Bypass.open()
       {:ok, bypass: bypass}
     end
@@ -95,7 +94,7 @@ defmodule HttpStageTest do
       assert take_events(producer, 2) == [["first"], ["second"]]
     end
 
-    @tag timeout: 2_000
+    @tag pool_timeout: 2_000
     @tag :capture_log
     test "schedules a fetch again if there's a disconnection", %{bypass: bypass} do
       Bypass.expect(bypass, fn conn ->
@@ -109,7 +108,10 @@ defmodule HttpStageTest do
       end)
 
       {:ok, producer} =
-        start_producer(bypass, fetch_after: 50, get_opts: [timeout: 100, recv_timeout: 100])
+        start_producer(bypass,
+          fetch_after: 50,
+          get_opts: [pool_timeout: 100, receive_timeout: 100]
+        )
 
       assert take_events(producer, 1) == [["reconnect"]]
     end
@@ -261,7 +263,7 @@ defmodule HttpStageTest do
 
     @tag :capture_log
     test "a fetch error is not fatal" do
-      {:ok, pid} = start_supervised({HttpStage, {"nodomain.dne", parser: & &1}})
+      {:ok, pid} = start_supervised({HttpStage, {"http://nodomain.dne", parser: & &1}})
 
       # this will never finish, so run it in a separate process
       Task.async(fn -> take_events(pid, 1) end)
