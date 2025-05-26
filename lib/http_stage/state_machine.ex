@@ -272,7 +272,7 @@ defmodule HttpStage.StateMachine do
     {time, parsed} = :timer.tc(machine.parser, [body])
 
     Logger.info(fn ->
-      "#{__MODULE__} updated: url=#{inspect(url(machine))} records=#{length(parsed)} time=#{time / 1000}"
+      "#{__MODULE__} updated: url=#{inspect(url(machine))} time=#{time / 1000}"
     end)
 
     machine =
