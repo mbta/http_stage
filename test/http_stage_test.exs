@@ -16,6 +16,11 @@ defmodule HttpStageTest do
       assert {:producer, state, _} = init({"url", parser: __MODULE__.TestParser})
       assert is_function(state.machine.parser, 1)
     end
+
+    test "accepts fetch_after option" do
+      assert {:producer, state, _} = init({"url", parser: & &1, fetch_after: 10})
+      assert state.machine.fetch_after == 10
+    end
   end
 
   describe "handle_info/2" do
