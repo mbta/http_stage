@@ -2,7 +2,7 @@ defmodule HttpStage.MixProject do
   use Mix.Project
 
   @name "HttpStage"
-  @version "0.1.0"
+  @version "0.2.0"
   @source_url "https://github.com/mbta/http_stage"
 
   def project do
@@ -11,7 +11,7 @@ defmodule HttpStage.MixProject do
       source_url: @source_url,
       version: @version,
       app: :http_stage,
-      elixir: "~> 1.12",
+      elixir: "~> 1.14",
       start_permanent: Mix.env() == :prod,
       deps: deps(),
       package: package(),
@@ -33,12 +33,11 @@ defmodule HttpStage.MixProject do
       {:bypass, "~> 2.1", only: :test},
       {:credo, "~> 1.7", only: [:dev, :test], runtime: false},
       {:dialyxir, "~> 1.4", only: [:dev, :test], runtime: false},
-      # Specifically targeting ex_doc v0.33 because it is the last version compatible with Elixir 1.12
-      {:ex_doc, "~> 0.33.0", only: :dev, runtime: false},
+      {:ex_doc, "~> 0.38", only: :dev, runtime: false},
       {:gen_stage, "~> 1.2"},
-      {:httpoison, "~> 2.1"},
       {:lcov_ex, "~> 0.3", only: [:dev, :test], runtime: false},
       {:plug, "~> 1.14"},
+      {:req, "~> 0.5"},
       {:sobelow, "~> 0.13", only: [:dev, :test], runtime: false},
       {:stream_data, "~> 1.2.0", only: :test}
     ]
