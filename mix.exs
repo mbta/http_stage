@@ -35,7 +35,6 @@ defmodule HttpStage.MixProject do
       {:dialyxir, "~> 1.4", only: [:dev, :test], runtime: false},
       {:ex_doc, "~> 0.38", only: :dev, runtime: false},
       {:gen_stage, "~> 1.2"},
-      {:httpoison, "~> 2.1"},
       {:lcov_ex, "~> 0.3", only: [:dev, :test], runtime: false},
       {:plug, "~> 1.14"},
       {:req, "~> 0.5"},
