@@ -7,6 +7,7 @@ defmodule HttpStage.StateMachine do
   * `content_warning_timeout`: number of milliseconds after which to log an error that the file is out of date
   * `fallback_url`: (optional) URL to use once the `content_warning_timeout` is hit.
   * `get_opts`: (optional) values to pass as options to Req
+  * `parse_full_response?`: (optional) whether to pass the full response to the parser. Defaults to passing only the body.
   """
   require Logger
 
@@ -24,7 +25,8 @@ defmodule HttpStage.StateMachine do
             last_success: :never,
             previous_hash: -1,
             fallback: :undefined,
-            parser: :undefined
+            parser: :undefined,
+            parse_full_response?: false
 
   @type t :: %__MODULE__{url: binary}
   @type message :: {term, non_neg_integer}
@@ -37,7 +39,10 @@ defmodule HttpStage.StateMachine do
     state =
       struct!(
         state,
-        Keyword.take(opts, ~w(get_opts fetch_after content_warning_timeout headers)a)
+        Keyword.take(
+          opts,
+          ~w(get_opts fetch_after content_warning_timeout headers parse_full_response?)a
+        )
       )
 
     state = %{state | last_success: now() - state.fetch_after - 1}
@@ -126,9 +131,10 @@ defmodule HttpStage.StateMachine do
 
   defp handle_message(
          machine,
-         {:http_response, %Response{status: 200, headers: headers, body: body}}
+         {:http_response, %Response{status: 200, headers: headers, body: body} = response}
        ) do
-    {bodies, machine} = parse_bodies_if_changed(machine, body)
+    parse_input = if machine.parse_full_response?, do: response, else: body
+    {bodies, machine} = parse_bodies_if_changed(machine, parse_input)
     machine = update_cache_headers(machine, headers)
     {machine, messages} = check_last_success(machine)
     message = {:fetch, machine.url}

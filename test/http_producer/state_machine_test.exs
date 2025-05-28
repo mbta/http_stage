@@ -4,6 +4,8 @@ defmodule HttpStage.StateMachineTest do
   import HttpStage.StateMachine
   import ExUnit.CaptureLog
 
+  alias Req.Response
+
   setup_all do
     Application.ensure_all_started(:bypass)
     :ok
@@ -146,6 +148,18 @@ defmodule HttpStage.StateMachineTest do
       refute log == ""
     end
 
+    test "defaults to passing the response body to the parser" do
+      machine = init("url", parser: &send(self(), {:parse_arg, &1}))
+      message(machine, {:http_response, make_resp(body: "body")})
+      assert_receive {:parse_arg, "body"}
+    end
+
+    test "optionally passes the full response to the parser" do
+      machine = init("url", parse_full_response?: true, parser: &send(self(), {:parse_arg, &1}))
+      message(machine, {:http_response, make_resp(body: "body")})
+      assert_receive {:parse_arg, %Response{body: "body"}}
+    end
+
     test "receiving the same body twice does not send a second message" do
       messages = [
         {:http_response, make_resp(body: "body")},
@@ -258,6 +272,6 @@ defmodule HttpStage.StateMachineTest do
     code = Keyword.get(opts, :code, 200)
     body = Keyword.get(opts, :body, "")
     headers = Keyword.get(opts, :headers, [])
-    %Req.Response{body: body, headers: headers, status: code}
+    %Response{body: body, headers: headers, status: code}
   end
 end

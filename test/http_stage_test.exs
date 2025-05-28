@@ -21,6 +21,11 @@ defmodule HttpStageTest do
       assert {:producer, state, _} = init({"url", parser: & &1, fetch_after: 10})
       assert state.machine.fetch_after == 10
     end
+
+    test "accepts parse_full_response option" do
+      assert {:producer, state, _} = init({"url", parser: & &1, parse_full_response?: true})
+      assert state.machine.parse_full_response?
+    end
   end
 
   describe "handle_info/2" do

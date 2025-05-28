@@ -5,6 +5,9 @@ defmodule HttpStage.Parser do
   A parser is responsible for converting data received from an HTTP response into the format expected by consumers of the HttpStage.
   """
 
+  @type response_body :: term()
+  @type response :: %Req.Response{}
+
   @doc """
   Parses the given data.
 
@@ -16,5 +19,5 @@ defmodule HttpStage.Parser do
   ## Returns
     * The parsed data in the desired format.
   """
-  @callback parse(data :: term()) :: term()
+  @callback parse(data :: response_body() | response()) :: term()
 end
