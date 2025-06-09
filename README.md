@@ -2,9 +2,7 @@
 
 A GenStage Producer which fulfills demand by fetching from an HTTP Server.
 
-<!-- TODO: Uncomment once the docs are published to HexDocs
-  [Docs](https://hexdocs.pm/http_stage) 
--->
+[Docs](https://hexdocs.pm/http_stage)
 
 ## Installation
 
