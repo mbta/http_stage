@@ -1,7 +1,7 @@
 defmodule HttpStage.MixProject do
   use Mix.Project
 
-  @name "HttpStage"
+  @name "http_stage"
   @version "0.2.0"
   @source_url "https://github.com/mbta/http_stage"
 
