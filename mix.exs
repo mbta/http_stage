@@ -2,7 +2,7 @@ defmodule HttpStage.MixProject do
   use Mix.Project
 
   @name "http_stage"
-  @version "0.2.0"
+  @version "0.2.1"
   @source_url "https://github.com/mbta/http_stage"
 
   def project do
@@ -36,7 +36,7 @@ defmodule HttpStage.MixProject do
       {:ex_doc, "~> 0.38", only: :dev, runtime: false},
       {:gen_stage, "~> 1.2"},
       {:lcov_ex, "~> 0.3", only: [:dev, :test], runtime: false},
-      {:plug, "~> 1.14"},
+      {:plug, "~> 1.11"},
       {:req, "~> 0.5"},
       {:sobelow, "~> 0.13", only: [:dev, :test], runtime: false},
       {:stream_data, "~> 1.2.0", only: :test}
