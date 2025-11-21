@@ -28,7 +28,9 @@ Configure HttpStage with the data URL and any request options as a child of your
 ```elixir
 opts = [
   headers: %{"Authorization" => auth_key},
-  params: %{verbose: "true"}
+  get_opts: [
+    params: %{verbose: "true"}
+  ]
 ]
 
 Supervisor.child_spec(
