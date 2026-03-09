@@ -39,7 +39,7 @@ defmodule HttpStage.MixProject do
       {:plug, "~> 1.11"},
       {:req, "~> 0.5"},
       {:sobelow, "~> 0.13", only: [:dev, :test], runtime: false},
-      {:stream_data, "~> 1.2.0", only: :test}
+      {:stream_data, "~> 1.3.0", only: :test}
     ]
   end
 
