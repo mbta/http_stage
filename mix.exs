@@ -11,7 +11,7 @@ defmodule HttpStage.MixProject do
       source_url: @source_url,
       version: @version,
       app: :http_stage,
-      elixir: "~> 1.14",
+      elixir: "~> 1.15",
       start_permanent: Mix.env() == :prod,
       deps: deps(),
       package: package(),
