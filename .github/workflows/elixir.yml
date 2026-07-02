@@ -70,9 +70,12 @@ jobs:
       - name: Run tests
         run: mix test --cover
       - name: Save PR information
+        env:
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          PR_SHA: ${{ github.event.pull_request.head.sha }}
         run: |
-          echo "${{ github.event.pull_request.number }}" > cover/PR_NUMBER
-          echo "${{ github.event.pull_request.head.sha }}" > cover/PR_SHA
+          echo "$PR_NUMBER" > cover/PR_NUMBER
+          echo "$PR_SHA" > cover/PR_SHA
         if: github.event.pull_request
       - name: Upload coverage artifact
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
