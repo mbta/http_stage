@@ -96,7 +96,6 @@ jobs:
       - name: Run zizmor 🌈
         uses: zizmorcore/zizmor-action@192e21d79ab29983730a13d1382995c2307fbcaa # v0.5.7
         with:
-          # pedantic persona gives too many noisy template-injection problems to manually fix
-          persona: regular
+          persona: pedantic
           advanced-security: false
           annotations: true
