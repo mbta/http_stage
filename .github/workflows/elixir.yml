@@ -47,7 +47,7 @@ jobs:
           path: ~/.asdf
           key: ${{ runner.os }}-asdf-v2-${{ hashFiles('.tool-versions') }}
         id: asdf-cache
-      - uses: mbta/actions/reshim-asdf@2c88be6542aa1b129d6a273cae070af9b1e7c076 # v2.22
+      - uses: mbta/actions/reshim-asdf@f3f7205f8e73dddf983ee234dd93e2b45d3c8a9a # v2.23
       # The asdf job should have prepared the cache. exit if it didn't for some reason
       - run: exit 1
         if: steps.asdf-cache.outputs.cache-hit != 'true'
