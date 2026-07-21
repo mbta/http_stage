@@ -82,7 +82,7 @@ jobs:
         with:
           name: elixir-lcov
           path: cover/
-      - uses: mbta/actions/dialyzer@2c88be6542aa1b129d6a273cae070af9b1e7c076 # v2.22
+      - uses: mbta/actions/dialyzer@f3f7205f8e73dddf983ee234dd93e2b45d3c8a9a # v2.23
 
   zizmor:
     name: Run zizmor 🌈
