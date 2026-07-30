@@ -26,3 +26,5 @@ http_stage-*.tar
 /tmp/
 
 .vscode
+
+.elixir_ls
